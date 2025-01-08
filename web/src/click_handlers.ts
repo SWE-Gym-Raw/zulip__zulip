@@ -730,6 +730,51 @@ export function initialize(): void {
         browser_history.go_to_location(target);
     });
 
+    $("body").on("click", ".formatting-control-scroller-button", (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+
+        const scroller_button_width_px = 48;
+        // We scroll 60% of the viewable area on each click
+        const button_bar_scroll_percentage = 60 / 100;
+
+        const $target = $(e.currentTarget);
+        const $button_container = $target.closest(".compose-scrolling-buttons-container");
+        const $button_bar = $button_container.find(".compose-scrollable-buttons");
+
+        const button_container_width = Number(
+            $button_container.attr("data-button-container-width"),
+        );
+        const button_bar_max_left_scroll = Number(
+            $button_container.attr("data-button-bar-max-left-scroll"),
+        );
+
+        const button_bar_scroll_left = Number($button_bar.scrollLeft());
+        let new_scroll_position = 0;
+
+        assert(typeof button_bar_scroll_left === "number");
+
+        if ($target.hasClass("formatting-scroller-forward")) {
+            new_scroll_position =
+                button_bar_scroll_left + button_bar_scroll_percentage * button_container_width;
+            // If we're less than the width of the scroller button from
+            // the end, just scroll the rest of the way forward
+            if (button_bar_max_left_scroll <= new_scroll_position - scroller_button_width_px) {
+                new_scroll_position = button_bar_max_left_scroll;
+            }
+        } else {
+            new_scroll_position =
+                button_bar_scroll_left - button_bar_scroll_percentage * button_container_width;
+            // If we're less than the width of the scroller button from
+            // the start, just scroll the rest of the way back
+            if (new_scroll_position <= scroller_button_width_px) {
+                new_scroll_position = 0;
+            }
+        }
+
+        $button_bar.scrollLeft(new_scroll_position);
+    });
+
     function handle_compose_click(e: JQuery.ClickEvent): void {
         const $target = $(e.target);
         // Emoji clicks should be handled by their own click handler in emoji_picker.js

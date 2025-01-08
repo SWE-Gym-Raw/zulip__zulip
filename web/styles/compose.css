@@ -503,6 +503,7 @@
     grid-area: buttons;
     overflow-x: scroll;
     scrollbar-width: none;
+    scroll-behavior: smooth;
 }
 
 .formatting-control-scroller-button {
