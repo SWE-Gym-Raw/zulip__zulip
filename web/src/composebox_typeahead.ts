@@ -138,6 +138,7 @@ export function get_or_set_completing_for_tests(val?: string): string | null {
     }
     return completing;
 }
+let private_message_typeahead: Typeahead<UserGroupPillData | user_pill.UserPillData>;
 
 export function update_emoji_data(initial_emojis: EmojiDict[]): void {
     emoji_collection = [];
@@ -1416,7 +1417,7 @@ export function initialize({
         $element: $("#private_message_recipient"),
         type: "contenteditable",
     };
-    new Typeahead(private_message_typeahead_input, {
+    private_message_typeahead = new Typeahead(private_message_typeahead_input, {
         source: get_pm_people,
         items: max_num_items,
         helpOnEmptyStrings: true,
@@ -1456,6 +1457,11 @@ export function initialize({
             }
         },
         stopAdvance: true, // Do not advance to the next field on a Tab or Enter
+        on_show() {
+            private_message_typeahead.instance?.setProps({
+                offset: [0, 6],
+            });
+        },
     });
 
     initialize_compose_typeahead($("textarea#compose-textarea"));
